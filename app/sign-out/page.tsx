@@ -2,27 +2,38 @@
 
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@/app/context/AuthContext" // 👈 import your context hook
+import { useAuth } from "@/app/context/AuthContext"
+import { Box, Typography, CircularProgress } from "@mui/material"
 
 export default function LogoutPage() {
   const router = useRouter()
-  const { setUser } = useAuth() // 👈 get setUser from AuthContext
+  const { setUser } = useAuth()
 
   useEffect(() => {
     const logout = async () => {
       await fetch("/api/auth/signout", {
         method: "POST",
       })
-      setUser(null) // 👈 clear user from context
-      router.push("/") // redirect to home (or login) after logout
+      setUser(null)
+      router.push("/")
     }
 
     logout()
   }, [router, setUser])
 
   return (
-    <div className="flex items-center justify-center h-screen">
-      <p>Signing you out...</p>
-    </div>
+    <Box
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+      height="100vh"
+      flexDirection="column"
+      gap={2}
+    >
+      <CircularProgress color="primary" />
+      <Typography variant="body1" color="text.secondary">
+        Signing you out...
+      </Typography>
+    </Box>
   )
 }

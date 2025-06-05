@@ -1,3 +1,11 @@
+import { Box } from "@mui/material"
+
 export default function AdminPage() {
-  return <>Admin Page</>
+  return (
+    <>
+      <Box
+        sx={{ backgroundColor: "lightblue", height: "100px", width: "100px" }}
+      ></Box>
+    </>
+  )
 }

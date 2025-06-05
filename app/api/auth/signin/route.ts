@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
-import prisma from "@/app/lib/prisma"
+import { prisma } from "@/app/lib/prisma"
 import bcrypt from "bcrypt"
-import JWTService from "@/app/lib/jwtService"
+import { generateToken } from "@/app/lib/jwt" // your jose-based file
 
 export async function POST(req: Request) {
   try {
@@ -34,9 +34,9 @@ export async function POST(req: Request) {
       )
     }
 
-    const token = JWTService.sign({
-      id: user.id,
-      email: user.email,
+    // Generate JWT using jose-based method
+    const token = await generateToken({
+      userId: user.id,
       role: user.role,
     })
 

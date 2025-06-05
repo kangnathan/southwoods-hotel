@@ -2,11 +2,11 @@
 
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { SignUpCreateSchema } from "@/app/api/schemas/signup"
+import { SignUpCreateSchema } from "@/app/api/signup/schema"
 import { z } from "zod"
-import { useSignup, SignupError } from ".//hooks/useSignup"
-import { Box, Button, TextField, Typography, Alert } from "@mui/material"
-import { useAuth } from "@/app/context/AuthContext" // 👈 import this
+import { useSignup, SignupError } from "./hooks/useSignup"
+import { Box, Button, TextField, Typography, Alert, Paper } from "@mui/material"
+import { useAuth } from "@/app/context/AuthContext"
 import { UserRole } from "@prisma/client"
 import { useRouter } from "next/navigation"
 import Navbar from "../components/Navbar"
@@ -31,20 +31,10 @@ export default function SignupForm() {
     try {
       const response = await signupMutation.mutateAsync(data)
 
-      // Assuming the response includes the created user object
       if (response?.user) {
-        setUser({
-          id: response.user.id,
-          role: response.user.role,
-        })
+        setUser({ id: response.user.id, role: response.user.role })
+        router.push(response.user.role === UserRole.ADMIN ? "/admin" : "/guest")
       }
-      if (response.user.role === UserRole.ADMIN) {
-        router.push("/admin")
-      } else {
-        router.push("/guest")
-      }
-
-      // You can also do any redirect or notification here
     } catch (error: unknown) {
       const err = error as SignupError
       if (err?.errors) {
@@ -62,59 +52,124 @@ export default function SignupForm() {
   return (
     <>
       <Navbar />
+
       <Box
-        component="form"
-        onSubmit={handleSubmit(onSubmit)}
-        display="flex"
-        flexDirection="column"
-        gap={2}
-        maxWidth={400}
-        mx="auto"
-        mt={4}
+        sx={{
+          flex: 1,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          marginTop: "50px",
+        }}
       >
-        <Typography variant="h5" textAlign="center">
-          Sign Up
-        </Typography>
-
-        <TextField
-          label="Name"
-          {...register("name")}
-          error={!!errors.name}
-          helperText={errors.name?.message}
-        />
-        <TextField
-          label="Email"
-          type="email"
-          {...register("email")}
-          error={!!errors.email}
-          helperText={errors.email?.message}
-        />
-        <TextField
-          label="Phone"
-          {...register("phone")}
-          error={!!errors.phone}
-          helperText={errors.phone?.message}
-        />
-        <TextField
-          label="Password"
-          type="password"
-          {...register("password")}
-          error={!!errors.password}
-          helperText={errors.password?.message}
-        />
-
-        {signupMutation.isError && signupMutation.error?.error && (
-          <Alert severity="error">{signupMutation.error.error}</Alert>
-        )}
-
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          disabled={signupMutation.isPending}
+        <Paper
+          elevation={3}
+          sx={{
+            p: 4,
+            borderRadius: "1.5rem",
+            width: "100%",
+            maxWidth: 420,
+            bgcolor: "#f9f9f9",
+            boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+          }}
         >
-          {signupMutation.isPending ? "Signing Up..." : "Sign Up"}
-        </Button>
+          <Typography
+            variant="h4"
+            align="center"
+            gutterBottom
+            sx={{ fontWeight: 600, color: "#333" }}
+          >
+            Create Account
+          </Typography>
+
+          <Typography
+            variant="subtitle1"
+            align="center"
+            gutterBottom
+            sx={{ color: "#666" }}
+          >
+            Join Southwoods Hotel
+          </Typography>
+
+          <Box
+            component="form"
+            onSubmit={handleSubmit(onSubmit)}
+            sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}
+          >
+            <TextField
+              label="First Name"
+              {...register("firstName")}
+              error={!!errors.firstName}
+              helperText={errors.firstName?.message}
+              InputProps={{
+                sx: { borderRadius: "0.75rem", bgcolor: "#fff" },
+              }}
+            />
+            <TextField
+              label="Last Name"
+              {...register("lastName")}
+              error={!!errors.lastName}
+              helperText={errors.lastName?.message}
+              InputProps={{
+                sx: { borderRadius: "0.75rem", bgcolor: "#fff" },
+              }}
+            />
+            <TextField
+              label="Email"
+              type="email"
+              {...register("email")}
+              error={!!errors.email}
+              helperText={errors.email?.message}
+              InputProps={{
+                sx: { borderRadius: "0.75rem", bgcolor: "#fff" },
+              }}
+            />
+            <TextField
+              label="Phone"
+              {...register("phone")}
+              error={!!errors.phone}
+              helperText={errors.phone?.message}
+              InputProps={{
+                sx: { borderRadius: "0.75rem", bgcolor: "#fff" },
+              }}
+            />
+            <TextField
+              label="Password"
+              type="password"
+              {...register("password")}
+              error={!!errors.password}
+              helperText={errors.password?.message}
+              InputProps={{
+                sx: { borderRadius: "0.75rem", bgcolor: "#fff" },
+              }}
+            />
+
+            {signupMutation.isError && signupMutation.error?.error && (
+              <Alert severity="error" sx={{ borderRadius: "0.5rem" }}>
+                {signupMutation.error.error}
+              </Alert>
+            )}
+
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={signupMutation.isPending}
+              sx={{
+                mt: 1,
+                py: 1.5,
+                borderRadius: "0.75rem",
+                backgroundColor: "#111",
+                textTransform: "none",
+                fontWeight: "bold",
+                "&:hover": {
+                  backgroundColor: "#000",
+                },
+              }}
+            >
+              {signupMutation.isPending ? "Signing Up..." : "Sign Up"}
+            </Button>
+          </Box>
+        </Paper>
       </Box>
     </>
   )

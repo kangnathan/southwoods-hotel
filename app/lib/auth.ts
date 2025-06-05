@@ -1,4 +1,3 @@
-// lib/auth.ts
 import { cookies } from "next/headers"
 import { verifyToken } from "./jwt"
 
@@ -11,7 +10,7 @@ export async function getUser() {
   try {
     const payload = await verifyToken(token)
     return {
-      id: payload.userId,
+      id: payload.userId, // ✅ Correct key
       role: payload.role,
     }
   } catch {

@@ -1,9 +1,8 @@
-// app/api/auth/signup/route.ts
 import { NextResponse } from "next/server"
-import prisma from "@/app/lib/prisma"
+import { prisma } from "@/app/lib/prisma"
 import bcrypt from "bcrypt"
-import JWTService from "@/app/lib/jwtService"
-import { SignUpCreateSchema } from "@/app/api/schemas/signup"
+import { generateToken } from "@/app/lib/jwt" // uses jose
+import { SignUpCreateSchema } from "@/app/api/signup/schema"
 import { validateSignup } from "@/app/utils/validateSignup"
 import { UserRole } from "@prisma/client"
 
@@ -21,9 +20,15 @@ export async function POST(req: Request) {
       )
     }
 
-    const { name, email, phone, password } = parsed.data
+    const { firstName, lastName, email, phone, password } = parsed.data
 
-    const customErrors = await validateSignup({ name, email, phone, password })
+    const customErrors = await validateSignup({
+      firstName,
+      lastName,
+      email,
+      phone,
+      password,
+    })
 
     if (Object.keys(customErrors).length > 0) {
       return NextResponse.json(
@@ -36,7 +41,8 @@ export async function POST(req: Request) {
 
     const newUser = await prisma.user.create({
       data: {
-        name,
+        firstName,
+        lastName,
         email,
         phone,
         password: hashedPassword,
@@ -44,28 +50,23 @@ export async function POST(req: Request) {
       },
     })
 
-    const token = JWTService.sign({
-      id: newUser.id, // ✅ changed from userId to id
-      email: newUser.email,
+    const token = await generateToken({
+      userId: newUser.id,
       role: newUser.role,
-    })
-
-    const user = await prisma.user.findUnique({
-      where: { email },
     })
 
     const response = NextResponse.json({
       success: true,
       user: {
-        id: user?.id,
-        role: user?.role,
+        id: newUser.id,
+        role: newUser.role,
       },
     })
 
     response.cookies.set("southwoods-hotel", token, {
       httpOnly: true,
       sameSite: "strict",
-      maxAge: 60 * 60 * 24,
+      maxAge: 60 * 60 * 24, // 1 day
       secure: process.env.NODE_ENV === "production",
       path: "/",
     })

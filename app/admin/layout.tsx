@@ -1,25 +1,17 @@
-// app/admin/layout.tsx
+"use client"
 import { ReactNode } from "react"
-import { redirect } from "next/navigation"
-import { AdminNavbar } from "@/app/components/Admin/Navbar"
-import { getUser } from "@/app/lib/auth"
-import { UserRole } from "@prisma/client"
+import { Container, CssBaseline } from "@mui/material"
+import Sidebar from "../components/Admin/AdminSidebar"
+import { Toaster } from "../components/_common/Toast"
 
-export default async function AdminLayout({
-  children,
-}: {
-  children: ReactNode
-}) {
-  const user = await getUser()
-
-  if (!user || user.role !== UserRole.ADMIN) {
-    redirect("/unauthorized")
-  }
-
+export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
-    <div>
-      <AdminNavbar />
-      {children}
-    </div>
+    <>
+      <CssBaseline />
+      <Sidebar>
+        <Toaster />
+        <Container>{children}</Container>
+      </Sidebar>
+    </>
   )
 }

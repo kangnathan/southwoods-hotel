@@ -1,3 +1,5 @@
-export default function GuestPage() {
-  return <>Guest Page</>
+import { GuestRooms } from "@/app/components/Guest/Rooms"
+
+export default function GuestRoomsPage() {
+  return <GuestRooms />
 }

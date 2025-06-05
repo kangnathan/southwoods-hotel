@@ -1,25 +1,21 @@
-// app/guest/layout.tsx
+"use client"
 import { ReactNode } from "react"
-import { redirect } from "next/navigation"
+import { CssBaseline, Container } from "@mui/material"
 import { GuestNavbar } from "@/app/components/Guest/GuestNavbar"
-import { getUser } from "@/app/lib/auth"
-import { UserRole } from "@prisma/client"
+import GuestSidebar from "../components/Guest/GuestSidebar"
+import { Toaster } from "../components/_common/Toast"
 
-export default async function GuestLayout({
-  children,
-}: {
-  children: ReactNode
-}) {
-  const user = await getUser()
-
-  if (!user || user.role !== UserRole.GUEST) {
-    redirect("/unauthorized")
-  }
-
+export default function GuestLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen bg-white">
-      <GuestNavbar />
-      <main className="p-4">{children}</main>
-    </div>
+    <>
+      <CssBaseline />
+      <GuestSidebar>
+        <Container>
+          <Toaster />
+          <GuestNavbar />
+          {children}
+        </Container>
+      </GuestSidebar>
+    </>
   )
 }

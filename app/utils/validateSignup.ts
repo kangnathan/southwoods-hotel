@@ -1,10 +1,11 @@
 // app/utils/validateSignup.ts
-import { SignUpCreateSchema } from "@/app/api/schemas/signup"
-import prisma from "@/app/lib/prisma"
+import { SignUpCreateSchema } from "@/app/api/signup/schema"
+import { prisma } from "@/app/lib/prisma"
 import z from "zod"
 
 interface SignupErrors {
-  name?: string
+  firstName?: string
+  lastName?: string
   email?: string
   phone?: string
   password?: string
@@ -16,19 +17,25 @@ export async function validateSignup(
 ): Promise<SignupErrors> {
   const errors: SignupErrors = {}
 
-  const { name, email, phone, password } = input
+  const { firstName, lastName, email, phone, password } = input
 
-  if (!name && !email && !password && !phone) {
+  if (!firstName && !lastName && !email && !password && !phone) {
     errors.general = "All fields are required"
     return errors
   }
 
   // 🧼 Name validation
-  const nameRegex = /^[a-zA-Z0-9]+$/
-  if (!name || name.trim().length < 3) {
-    errors.name = "Name must be at least 3 characters long"
-  } else if (!nameRegex.test(name)) {
-    errors.name = "Name can only contain letters and numbers"
+  const firstNameRegex = /^[a-zA-Z0-9]+$/
+  if (!firstName || firstName.trim().length < 3) {
+    errors.firstName = "First name must be at least 3 characters long"
+  } else if (!firstNameRegex.test(firstName)) {
+    errors.firstName = "First name only contain letters and numbers"
+  }
+  const lastNameRegex = /^[a-zA-Z0-9]+$/
+  if (!lastName || lastName.trim().length < 3) {
+    errors.firstName = "Last name must be at least 3 characters long"
+  } else if (!lastNameRegex.test(lastName)) {
+    errors.lastName = "Last name can only contain letters and numbers"
   }
 
   // 📧 Email validation (Zod already checks format)

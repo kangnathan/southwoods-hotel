@@ -8,8 +8,7 @@ export type SignupError = {
 
 type SignupResponse = {
   user: { id: number; role: string }
-
-  message: string // adjust based on what your API returns
+  success: boolean
 }
 
 export function useSignup(): UseMutationResult<
@@ -26,6 +25,7 @@ export function useSignup(): UseMutationResult<
       })
 
       const result = await res.json()
+      console.log("Signup result:", result)
 
       if (!res.ok) {
         throw result as SignupError

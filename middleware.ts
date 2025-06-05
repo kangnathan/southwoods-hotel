@@ -1,48 +1,34 @@
-import { NextResponse } from "next/server"
-import { cookies } from "next/headers"
-import * as jose from "jose"
+// middleware.ts
+import { NextRequest, NextResponse } from "next/server"
+import { verifyToken } from "./app/lib/jwt"
+import { UserRole } from "@prisma/client"
 
-const jwtSecret = new TextEncoder().encode(process.env.JWT_SECRET!)
-
-const protectedRoutes: Record<"ADMIN" | "GUEST", string[]> = {
-  ADMIN: ["/dashboard"],
-  GUEST: ["/dashboard"],
-}
-
-export async function middleware(request: Request) {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("southwoods-hotel")?.value
+export async function middleware(req: NextRequest) {
+  const token = req.cookies.get("southwoods-hotel")?.value
 
   if (!token) {
-    return NextResponse.redirect(new URL("/", request.url))
+    return NextResponse.redirect(new URL("/sign-out", req.url))
   }
 
   try {
-    const { payload } = await jose.jwtVerify(token, jwtSecret)
+    const payload = await verifyToken(token)
 
-    const userId = payload.userId
-    const role = payload.role as "ADMIN" | "GUEST"
-    const pathname = new URL(request.url).pathname
-
-    if (!userId || !role) {
-      return NextResponse.redirect(new URL("/", request.url))
+    if (payload.role === UserRole.ADMIN) {
+      if (!req.nextUrl.pathname.startsWith("/admin")) {
+        return NextResponse.redirect(new URL("/admin", req.url))
+      }
+    } else {
+      if (!req.nextUrl.pathname.startsWith("/guest")) {
+        return NextResponse.redirect(new URL("/guest", req.url))
+      }
     }
 
-    const allowedPaths = protectedRoutes[role] || []
-    const isAuthorized = allowedPaths.some((route) =>
-      pathname.startsWith(route)
-    )
-
-    if (!isAuthorized) {
-      return NextResponse.redirect(new URL("/unauthorized", request.url))
-    }
+    return NextResponse.next()
   } catch {
-    return NextResponse.redirect(new URL("/", request.url))
+    return NextResponse.redirect(new URL("/sign-out", req.url))
   }
-
-  return NextResponse.next()
 }
 
 export const config = {
-  matcher: ["/dashboard"],
+  matcher: ["/guest/:path*", "/admin/:path*"],
 }
