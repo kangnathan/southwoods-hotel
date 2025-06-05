@@ -46,3 +46,39 @@ export async function PUT(req: NextRequest) {
     }
   }
 }
+
+export async function GET(req: NextRequest) {
+  try {
+    const url = new URL(req.url)
+    const id = url.pathname.split("/").pop()
+    const reservationId = parseInt(id ?? "", 10)
+
+    if (isNaN(reservationId)) {
+      return NextResponse.json(
+        { error: "Invalid reservation ID" },
+        { status: 400 }
+      )
+    }
+
+    const room = await prisma.reservation.findUnique({
+      where: { id: reservationId },
+      include: {
+        room: true,
+      },
+    })
+
+    if (!room) {
+      return NextResponse.json(
+        { error: "Reservation not found" },
+        { status: 404 }
+      )
+    }
+
+    return NextResponse.json(room)
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Unknown error" },
+      { status: 500 }
+    )
+  }
+}

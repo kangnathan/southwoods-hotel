@@ -55,6 +55,7 @@ export const ReservationCard: FC<ReservationCardProps> = ({
           <Typography variant="subtitle2" fontWeight={600} color="text.primary">
             Reservation {id}
           </Typography>
+
           <Box
             sx={{
               px: 1.5,
