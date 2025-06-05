@@ -5,7 +5,12 @@ import { handleMutationError } from "@/app/utils/handleMutationError"
 
 export async function GET() {
   try {
-    const reservations = await prisma.reservation.findMany()
+    const reservations = await prisma.reservation.findMany({
+      include: {
+        user: true,
+        room: true,
+      },
+    })
 
     return NextResponse.json(reservations, { status: 200 })
   } catch (error) {

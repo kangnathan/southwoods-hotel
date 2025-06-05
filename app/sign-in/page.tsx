@@ -41,7 +41,7 @@ export default function LoginPage() {
     }
     toast.success("Login successful!")
     setUser({ id: data.user.id, role: data.user.role })
-    router.push(data.user.role === UserRole.ADMIN ? "/admin" : "/guest")
+    router.push(data.user.role === UserRole.ADMIN ? "/admin/rooms" : "/guest")
   }
 
   return (

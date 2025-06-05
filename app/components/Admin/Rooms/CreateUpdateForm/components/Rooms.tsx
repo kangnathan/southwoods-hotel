@@ -62,14 +62,14 @@ export const regularRoomImagesOptions: RoomOption[] = [
   },
   {
     name: "Indiana Jones",
-    src: "/assets/premium/indiana_jones.jpg",
+    src: "/assets/deluxe/indiana_jones.jpg",
   },
   {
     name: "Minimalist",
-    src: "/assets/premium/minimalist.jpg",
+    src: "/assets/deluxe/minimalist.jpg",
   },
   {
     name: "Oceanarium",
-    src: "/assets/premium/oceanarium.jpg",
+    src: "/assets/deluxe/oceanarium.jpg",
   },
 ]
